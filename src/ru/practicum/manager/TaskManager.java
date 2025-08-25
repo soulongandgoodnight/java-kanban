@@ -22,9 +22,7 @@ public class TaskManager {
     }
 
     private int getUniqueTaskId() {
-        var result = uniqueTaskId;
-        uniqueTaskId = uniqueTaskId + 1;
-        return result;
+        return uniqueTaskId++;
     }
 
     public List<Task> getAllTasks () {
@@ -79,7 +77,7 @@ public class TaskManager {
         var epicId = this.getUniqueTaskId();
         epic.setId(epicId);
         epics.put(epicId, epic);
-        recalculateEpicStatus(epic);
+        epic.setStatus(TaskStatus.NEW);
         return epicId;
     }
 
@@ -92,7 +90,7 @@ public class TaskManager {
         var subtaskId = this.getUniqueTaskId();
         subtask.setId(subtaskId);
         subtasks.put(subtaskId, subtask);
-        existingEpic.getSubtasks().add(subtask);
+        existingEpic.addSubtask(subtask);
         recalculateEpicStatus(existingEpic);
         return subtaskId;
     }
@@ -124,7 +122,7 @@ public class TaskManager {
         subtasks.put(subtask.getId(), subtask);
         var epicSubtasks = existingEpic.getSubtasks();
         epicSubtasks.remove(existingSubtask);
-        epicSubtasks.add(subtask);
+        existingEpic.updateSubtask(subtask);
         recalculateEpicStatus(existingEpic);
     }
 
