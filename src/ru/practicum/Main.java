@@ -1,5 +1,6 @@
 package ru.practicum;
 
+import ru.practicum.manager.InMemoryTaskManager;
 import ru.practicum.manager.TaskManager;
 import ru.practicum.model.Epic;
 import ru.practicum.model.Subtask;
@@ -11,7 +12,7 @@ import java.util.HashSet;
 public class Main {
 
     public static void main(String[] args) {
-        var taskManager = new TaskManager();
+        var taskManager = new InMemoryTaskManager();
         testEpicsFlow(taskManager);
         testTasksFlow(taskManager);
     }
@@ -26,7 +27,7 @@ public class Main {
         System.out.println("Тестирование задач. Создание задач. Ожидаемое количество задач: 2; " +
                 "Реальное количество задач: " + allTasks.size());
 
-        var taskForUpdate = taskManager.getTaskById(task1Id);
+        var taskForUpdate = taskManager.getTask(task1Id);
         var updatedTask1 = new Task(taskForUpdate.getName(), taskForUpdate.getDescription(), taskForUpdate.getId(),
                 TaskStatus.IN_PROGRESS);
         taskManager.updateTask(updatedTask1);
@@ -36,13 +37,13 @@ public class Main {
         System.out.println("Тестирование задач. Обновление задачи. Ожидаемый статус задачи: " + TaskStatus.IN_PROGRESS
                 + "; Реальный статус задачи: " + actualUpdatedTask.getStatus());
 
-        var actualTaskById = taskManager.getTaskById(taskForUpdate.getId());
+        var actualTaskById = taskManager.getTask(taskForUpdate.getId());
         System.out.println("Тестирование задач. Получение задачи по id. id задачи: " + taskForUpdate.getId()
                 + "; Полученная задача: " + actualTaskById);
 
         taskManager.deleteTask(actualTaskById.getId());
         System.out.println("Тестирование задач. Удаление задачи по id. id задачи: " + actualTaskById.getId()
-                + "; Полученная задача: " + taskManager.getTaskById(actualTaskById.getId()));
+                + "; Полученная задача: " + taskManager.getTask(actualTaskById.getId()));
 
         taskManager.deleteAllTasks();
         var remainingTasks = taskManager.getAllTasks();
@@ -84,14 +85,14 @@ public class Main {
         System.out.println("Тестирование эпиков. Создание эпиков. Ожидаемое количество подзадач: 3; " +
                 "Реальное количество подзадач: " + actualSubtasksCount);
 
-        var actualEpicById = taskManager.getEpicById(epic1Id);
+        var actualEpicById = taskManager.getEpic(epic1Id);
         System.out.println("Тестирование эпиков. Получение эпика по id. id эпика: " + epic1Id
                 + "; Полученный эпик: " + actualEpicById);
 
         var epicForStatusUpdate = new Epic(actualEpicById.getName(), actualEpicById.getDescription(), actualEpicById.getId(),
                 TaskStatus.DONE);
         taskManager.updateEpic(epicForStatusUpdate);
-        var actualEpicForStatusUpdate = taskManager.getEpicById(epicForStatusUpdate.getId());
+        var actualEpicForStatusUpdate = taskManager.getEpic(epicForStatusUpdate.getId());
         System.out.println("Тестирование эпиков. Обновление статуса эпика. Ожидаемый статус: " + TaskStatus.NEW
                 + "; Реальный статус: " + actualEpicForStatusUpdate.getStatus());
 
@@ -99,7 +100,7 @@ public class Main {
         epicSubtask.setStatus(TaskStatus.IN_PROGRESS);
         taskManager.updateSubtask(epicSubtask);
 
-        var actualEpicWithUpdatedSubtask = taskManager.getEpicById(epicForStatusUpdate.getId());
+        var actualEpicWithUpdatedSubtask = taskManager.getEpic(epicForStatusUpdate.getId());
         System.out.println("Тестирование эпиков. Обновление статуса подзадачи. Ожидаемый статус эпика: "
                 + TaskStatus.IN_PROGRESS + "; Реальный статус :" + actualEpicWithUpdatedSubtask.getStatus());
 
@@ -109,7 +110,7 @@ public class Main {
                 + "Реальное количество подзадач:" + taskManager.getAllSubtasks().size());
 
         System.out.println("Тестирование эпиков. Удаление подзадачи. Ожидаемый статус эпика: "
-                + TaskStatus.NEW + "; Реальный статус :" + taskManager.getEpicById(epic1Id).getStatus());
+                + TaskStatus.NEW + "; Реальный статус :" + taskManager.getEpic(epic1Id).getStatus());
 
         taskManager.deleteEpic(epicForStatusUpdate.getId());
         var epicsCount = taskManager.getAllEpics().size();
