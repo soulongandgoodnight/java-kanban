@@ -11,7 +11,7 @@ import ru.practicum.model.TaskStatus;
 import java.util.ArrayList;
 
 class InMemoryTaskManagerTest {
-    private static TaskManager taskManager;
+    private TaskManager taskManager;
 
     @BeforeEach
     public void beforeEach(){
