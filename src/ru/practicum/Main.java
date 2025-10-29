@@ -17,7 +17,7 @@ public class Main {
         testTasksFlow(taskManager);
     }
 
-    private static void testTasksFlow(TaskManager taskManager){
+    private static void testTasksFlow(TaskManager taskManager) {
         var task1 = new Task("Задача 1", "Описание задачи 1", 0, TaskStatus.NEW);
         var task2 = new Task("Задача 2", "Описание задачи 2", 0, TaskStatus.NEW);
         var task1Id  = taskManager.createTask(task1);
@@ -74,7 +74,7 @@ public class Main {
             taskManager.createSubtask(subtask);
         }
 
-        for(var subtask: subtasks2) {
+        for (var subtask: subtasks2) {
             taskManager.createSubtask(subtask);
         }
 
