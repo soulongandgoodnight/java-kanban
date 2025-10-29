@@ -8,10 +8,10 @@ import ru.practicum.model.TaskStatus;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int uniqueTaskId = 1;
-    private final HashMap<Integer,Task> tasks;
-    private final HashMap<Integer, Epic> epics;
-    private final HashMap<Integer,Subtask> subtasks;
+    protected int uniqueTaskId = 1;
+    protected final HashMap<Integer,Task> tasks;
+    protected final HashMap<Integer, Epic> epics;
+    protected final HashMap<Integer,Subtask> subtasks;
     private final HistoryManager historyManager;
 
     public InMemoryTaskManager(){
