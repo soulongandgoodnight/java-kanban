@@ -8,7 +8,7 @@ public class Task {
     protected int id;
     protected TaskStatus status;
 
-    public Task(String name, String description, int id, TaskStatus status){
+    public Task(String name, String description, int id, TaskStatus status) {
         this.name = name;
         this.description = description;
         this.id = id;
@@ -36,7 +36,7 @@ public class Task {
                 '}';
     }
 
-    public int getId(){
+    public int getId() {
         return id;
     }
 
@@ -64,7 +64,7 @@ public class Task {
         return status;
     }
 
-    public void setStatus(TaskStatus status){
+    public void setStatus(TaskStatus status) {
         this.status = status;
     }
 }

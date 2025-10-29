@@ -14,12 +14,12 @@ class InMemoryTaskManagerTest {
     private TaskManager taskManager;
 
     @BeforeEach
-    public void beforeEach(){
+    public void beforeEach() {
         taskManager = Managers.getDefault();
     }
 
     @Test
-    public void shouldNotAddEpicAsSubtask(){
+    public void shouldNotAddEpicAsSubtask() {
         var epicId = 29302;
         var epic = new Epic("Epic for tests name", "Epic for tests description", epicId, TaskStatus.NEW);
         var epicAsSubtask = new Subtask("Subtask name", "Subtask description", epicId, TaskStatus.NEW, epicId);
@@ -32,7 +32,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldReturnThreeTasksWhenAddedThreeTasks(){
+    public void shouldReturnThreeTasksWhenAddedThreeTasks() {
         var task1 = new Task("name", "description", 1, TaskStatus.NEW);
         var task2 = new Task("name", "description", 2, TaskStatus.NEW);
         var task3 = new Task("name", "description", 3, TaskStatus.NEW);
@@ -40,7 +40,7 @@ class InMemoryTaskManagerTest {
         expectedTasks.add(task1);
         expectedTasks.add(task2);
         expectedTasks.add(task3);
-        for(var expectedTask: expectedTasks) {
+        for (var expectedTask : expectedTasks) {
             taskManager.createTask(expectedTask);
         }
 
@@ -50,7 +50,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldReturnThreeEpicsWhenAddedThreeEpics(){
+    public void shouldReturnThreeEpicsWhenAddedThreeEpics() {
         var epic1 = new Epic("name", "description", 1, TaskStatus.NEW);
         var epic2 = new Epic("name", "description", 2, TaskStatus.NEW);
         var epic3 = new Epic("name", "description", 3, TaskStatus.NEW);
@@ -58,7 +58,7 @@ class InMemoryTaskManagerTest {
         expectedEpics.add(epic1);
         expectedEpics.add(epic2);
         expectedEpics.add(epic3);
-        for(var expectedEpic: expectedEpics) {
+        for (var expectedEpic : expectedEpics) {
             taskManager.createEpic(expectedEpic);
         }
 
@@ -68,7 +68,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldReturnThreeSubtasksWhenAddedThreeSubtasks(){
+    public void shouldReturnThreeSubtasksWhenAddedThreeSubtasks() {
         var epic = new Epic("name", "description", 1, TaskStatus.NEW);
         var subtask1 = new Subtask("name", "description", 2, TaskStatus.NEW, epic.getId());
         var subtask2 = new Subtask("name", "description", 3, TaskStatus.NEW, epic.getId());
@@ -79,7 +79,7 @@ class InMemoryTaskManagerTest {
         expectedSubtasks.add(subtask3);
 
         taskManager.createEpic(epic);
-        for(var subtask: expectedSubtasks) {
+        for (var subtask : expectedSubtasks) {
             taskManager.createSubtask(subtask);
         }
 
@@ -89,7 +89,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldDeleteAllTasks(){
+    public void shouldDeleteAllTasks() {
         var task1 = new Task("name", "description", 1, TaskStatus.NEW);
         var task2 = new Task("name", "description", 2, TaskStatus.NEW);
         var task3 = new Task("name", "description", 3, TaskStatus.NEW);
@@ -102,7 +102,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldDeleteAllEpics(){
+    public void shouldDeleteAllEpics() {
         var epic1 = new Epic("name", "description", 1, TaskStatus.NEW);
         var epic2 = new Epic("name", "description", 2, TaskStatus.NEW);
         var epic3 = new Epic("name", "description", 3, TaskStatus.NEW);
@@ -122,7 +122,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldDeleteAllSubtasks(){
+    public void shouldDeleteAllSubtasks() {
         var epic = new Epic("name", "description", 1, TaskStatus.NEW);
         var subtask1 = new Subtask("name", "description", 2, TaskStatus.NEW, epic.getId());
         var subtask2 = new Subtask("name", "description", 3, TaskStatus.NEW, epic.getId());
@@ -139,7 +139,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldReturnTaskById(){
+    public void shouldReturnTaskById() {
         var task = new Task("name", "description", 1231242, TaskStatus.NEW);
         var taskId = taskManager.createTask(task);
         var taskById = taskManager.getTask(taskId);
@@ -147,7 +147,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldReturnEpicById(){
+    public void shouldReturnEpicById() {
         var epic = new Epic("name", "description", 1, TaskStatus.NEW);
         var epicId = taskManager.createEpic(epic);
         var epicById = taskManager.getEpic(epicId);
@@ -156,7 +156,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldReturnSubtaskById(){
+    public void shouldReturnSubtaskById() {
         var epic = new Epic("name", "description", 123213, TaskStatus.NEW);
         var epicId = taskManager.createEpic(epic);
         var subtask = new Subtask("name", "description", 432123, TaskStatus.NEW, epicId);
@@ -167,7 +167,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldNotConflictWithIdsWhenCreateTasks(){
+    public void shouldNotConflictWithIdsWhenCreateTasks() {
         var taskId = 12312312;
         var task = new Task("name", "description", taskId, TaskStatus.NEW);
         taskManager.createTask(task);
@@ -178,7 +178,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldNotChangeTaskWhenAddingTaskByManager(){
+    public void shouldNotChangeTaskWhenAddingTaskByManager() {
         var expectedTask = new Task("name", "description", 123213, TaskStatus.NEW);
         var newTaskId = taskManager.createTask(expectedTask);
         var actualTask = taskManager.getTask(newTaskId);
@@ -188,7 +188,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldSavePreviousStateOfTaskWhenTaskIsUpdated(){
+    public void shouldSavePreviousStateOfTaskWhenTaskIsUpdated() {
         var expectedTask = new Task("Original name", "Original description", 123213, TaskStatus.NEW);
         var expectedTaskId = taskManager.createTask(expectedTask);
         taskManager.getTask(expectedTaskId);

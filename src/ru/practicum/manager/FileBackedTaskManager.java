@@ -31,7 +31,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.epics.putAll(epics);
         this.subtasks.putAll(subtasks);
 
-        for (var subtask: this.subtasks.values()) {
+        for (var subtask : this.subtasks.values()) {
             var epicId = subtask.getEpicId();
             var epic = this.epics.get(epicId);
             if (epic != null) {
@@ -54,13 +54,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
 
                 var baseTask = fromString(line);
-                switch(baseTask) {
+                switch (baseTask) {
                     case Epic epic -> epics.put(epic.getId(), epic);
                     case Subtask subtask -> subtasks.put(subtask.getId(), subtask);
                     case Task task -> tasks.put(task.getId(), task);
                 }
             }
-        }  catch (IOException e) {
+        } catch (IOException e) {
             throw new ManagerSaveException();
         }
 
@@ -125,7 +125,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private void save() {
-        try ( var bw = new BufferedWriter(new FileWriter(file, false))) {
+        try (var bw = new BufferedWriter(new FileWriter(file, false))) {
             bw.write(FILE_HEADER);
             bw.newLine();
             for (var task : tasks.values()) {
@@ -149,12 +149,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private static String toString(Task task) {
         if (task instanceof Subtask subtask) {
-            return String.format("%s,%s,%s,%s,%s,%s",subtask.getId(),TaskType.SUBTASK, subtask.getName(),
-                    subtask.getStatus(),subtask.getDescription(), subtask.getEpicId());
+            return String.format("%s,%s,%s,%s,%s,%s", subtask.getId(), TaskType.SUBTASK, subtask.getName(),
+                    subtask.getStatus(), subtask.getDescription(), subtask.getEpicId());
         } else {
             var taskType = getTaskType(task);
-            return String.format("%s,%s,%s,%s,%s,",task.getId(),taskType, task.getName(),
-                    task.getStatus(),task.getDescription());
+            return String.format("%s,%s,%s,%s,%s,", task.getId(), taskType, task.getName(),
+                    task.getStatus(), task.getDescription());
         }
     }
 
