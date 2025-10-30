@@ -1,5 +1,6 @@
 package ru.practicum.manager;
 
+import ru.practicum.exception.ManagerLoadException;
 import ru.practicum.exception.ManagerSaveException;
 import ru.practicum.model.*;
 
@@ -15,7 +16,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager(File file) {
         super();
         this.file = file;
-        save();
+        try (var bw = new BufferedWriter(new FileWriter(file, false))) {
+            bw.write(FILE_HEADER);
+            bw.newLine();
+        } catch (IOException e) {
+            throw new ManagerSaveException();
+        }
     }
 
     private FileBackedTaskManager(File file, HashMap<Integer, Task> tasks, HashMap<Integer, Epic> epics,
@@ -61,7 +67,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
-            throw new ManagerSaveException();
+            throw new ManagerLoadException();
         }
 
         return new FileBackedTaskManager(file, tasks, epics, subtasks);
@@ -147,13 +153,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    private static String toString(Task task) {
+    private String toString(Task task) {
         if (task instanceof Subtask subtask) {
-            return String.format("%s,%s,%s,%s,%s,%s", subtask.getId(), TaskType.SUBTASK, subtask.getName(),
+            return String.format("%s,%s,%s,%s,%s,%s", subtask.getId(), task.getTaskType(), subtask.getName(),
                     subtask.getStatus(), subtask.getDescription(), subtask.getEpicId());
         } else {
-            var taskType = getTaskType(task);
-            return String.format("%s,%s,%s,%s,%s,", task.getId(), taskType, task.getName(),
+            return String.format("%s,%s,%s,%s,%s,", task.getId(), task.getTaskType(), task.getName(),
                     task.getStatus(), task.getDescription());
         }
     }
@@ -172,13 +177,5 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
 
         return result;
-    }
-
-    private static TaskType getTaskType(Task task) {
-        return switch (task) {
-            case Subtask ignored -> TaskType.SUBTASK;
-            case Epic ignored -> TaskType.EPIC;
-            case null, default -> TaskType.TASK;
-        };
     }
 }
