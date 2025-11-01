@@ -5,16 +5,18 @@ import ru.practicum.model.Subtask;
 import ru.practicum.model.Task;
 import ru.practicum.model.TaskStatus;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int uniqueTaskId = 1;
-    private final HashMap<Integer,Task> tasks;
-    private final HashMap<Integer, Epic> epics;
-    private final HashMap<Integer,Subtask> subtasks;
+    protected int uniqueTaskId = 1;
+    protected final HashMap<Integer, Task> tasks;
+    protected final HashMap<Integer, Epic> epics;
+    protected final HashMap<Integer, Subtask> subtasks;
     private final HistoryManager historyManager;
 
-    public InMemoryTaskManager(){
+    public InMemoryTaskManager() {
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subtasks = new HashMap<>();
@@ -54,7 +56,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllSubtasks() {
         subtasks.clear();
-        for(var epic : epics.values()) {
+        for (var epic : epics.values()) {
             epic.removeAllSubtasks();
             recalculateEpicStatus(epic);
         }
@@ -124,7 +126,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpic(Epic epic) {
         var epicId = epic.getId();
         var existingEpic = this.epics.get(epicId);
-        if (existingEpic == null)  {
+        if (existingEpic == null) {
             return;
         }
 
@@ -158,7 +160,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         var epicSubtasks = epic.getSubtasks();
-        for (var epicSubtask: epicSubtasks) {
+        for (var epicSubtask : epicSubtasks) {
             subtasks.remove(epicSubtask.getId());
         }
 
@@ -197,7 +199,7 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    private void recalculateEpicStatus(Epic epic){
+    private void recalculateEpicStatus(Epic epic) {
         var subtasks = epic.getSubtasks();
         if (subtasks == null || subtasks.isEmpty()) {
             epic.setStatus(TaskStatus.NEW);
@@ -206,13 +208,15 @@ public class InMemoryTaskManager implements TaskManager {
 
         var allSubtasksAreNew = true;
         var allSubtasksAreDone = true;
-        for (Subtask subtask : subtasks)
-        {
-            switch (subtask.getStatus())
-            {
-                case NEW : allSubtasksAreDone = false; break;
-                case DONE : allSubtasksAreNew = false; break;
-                case IN_PROGRESS :
+        for (Subtask subtask : subtasks) {
+            switch (subtask.getStatus()) {
+                case NEW:
+                    allSubtasksAreDone = false;
+                    break;
+                case DONE:
+                    allSubtasksAreNew = false;
+                    break;
+                case IN_PROGRESS:
                     allSubtasksAreDone = false;
                     allSubtasksAreNew = false;
                     break;
@@ -221,7 +225,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (allSubtasksAreNew) {
             epic.setStatus(TaskStatus.NEW);
-        } else if (allSubtasksAreDone){
+        } else if (allSubtasksAreDone) {
             epic.setStatus(TaskStatus.DONE);
         } else {
             epic.setStatus(TaskStatus.IN_PROGRESS);

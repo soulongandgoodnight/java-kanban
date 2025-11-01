@@ -8,26 +8,26 @@ class EpicTest {
     private static Epic epicForTests;
 
     @BeforeEach
-    public void beforeEach(){
+    public void beforeEach() {
         epicForTests = new Epic("Epic for tests name", "Epic for tests description", 29302, TaskStatus.NEW);
     }
 
     @Test
-    public void shouldReturnSameFieldsWhenCreateEpic(){
+    public void shouldReturnSameFieldsWhenCreateEpic() {
         var expectedName = "expected epic name";
         var expectedDescription = "expected epic description";
         var expectedTaskStatus = TaskStatus.NEW;
         var expectedId = 12;
         var epic = new Epic(expectedName, expectedDescription, expectedId, expectedTaskStatus);
 
-        Assertions.assertEquals(expectedName, epic.getName(),"Имя эпика отличается от ожидаемого");
-        Assertions.assertEquals(expectedDescription, epic.getDescription(),"Описание эпика отличается от ожидаемого");
-        Assertions.assertEquals(expectedId, epic.getId(),"Идентификатор эпика отличается от ожидаемого");
-        Assertions.assertEquals(expectedTaskStatus, epic.getStatus(),"Статус эпика отличается от ожидаемого");
+        Assertions.assertEquals(expectedName, epic.getName(), "Имя эпика отличается от ожидаемого");
+        Assertions.assertEquals(expectedDescription, epic.getDescription(), "Описание эпика отличается от ожидаемого");
+        Assertions.assertEquals(expectedId, epic.getId(), "Идентификатор эпика отличается от ожидаемого");
+        Assertions.assertEquals(expectedTaskStatus, epic.getStatus(), "Статус эпика отличается от ожидаемого");
     }
 
     @Test
-    public void shouldAddSubtaskWhenAddSubtask(){
+    public void shouldAddSubtaskWhenAddSubtask() {
         var subtask = new Subtask("Subtask name", "Subtask description", 192, TaskStatus.NEW, epicForTests.getId());
         epicForTests.addSubtask(subtask);
 
@@ -37,7 +37,7 @@ class EpicTest {
     }
 
     @Test
-    public void shouldRemoveSubtaskWhenRemoveSubtask(){
+    public void shouldRemoveSubtaskWhenRemoveSubtask() {
         var subtask1 = new Subtask("Subtask name 1", "Subtask description 1", 192, TaskStatus.NEW, epicForTests.getId());
         var subtask2 = new Subtask("Subtask name 2", "Subtask description 2", 348, TaskStatus.NEW, epicForTests.getId());
         epicForTests.addSubtask(subtask1);

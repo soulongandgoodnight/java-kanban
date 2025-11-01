@@ -10,11 +10,16 @@ public class Epic extends Task {
         this.subtasks = new HashSet<>();
     }
 
+    @Override
+    public TaskType getTaskType() {
+        return TaskType.EPIC;
+    }
+
     public HashSet<Subtask> getSubtasks() {
         return subtasks;
     }
 
-    public void addSubtask(Subtask subtask){
+    public void addSubtask(Subtask subtask) {
         subtasks.add(subtask);
     }
 

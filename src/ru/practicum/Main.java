@@ -17,10 +17,10 @@ public class Main {
         testTasksFlow(taskManager);
     }
 
-    private static void testTasksFlow(TaskManager taskManager){
+    private static void testTasksFlow(TaskManager taskManager) {
         var task1 = new Task("Задача 1", "Описание задачи 1", 0, TaskStatus.NEW);
         var task2 = new Task("Задача 2", "Описание задачи 2", 0, TaskStatus.NEW);
-        var task1Id  = taskManager.createTask(task1);
+        var task1Id = taskManager.createTask(task1);
         taskManager.createTask(task2);
         var allTasks = taskManager.getAllTasks();
 
@@ -70,16 +70,16 @@ public class Main {
         System.out.println("Тестирование эпиков. Создание эпиков. Ожидаемое количество эпиков: 2; " +
                 "Реальное количество эпиков: " + allEpics.size());
 
-        for (var subtask: subtasks1) {
+        for (var subtask : subtasks1) {
             taskManager.createSubtask(subtask);
         }
 
-        for(var subtask: subtasks2) {
+        for (var subtask : subtasks2) {
             taskManager.createSubtask(subtask);
         }
 
         var actualSubtasksCount = 0;
-        for (var epic: allEpics) {
+        for (var epic : allEpics) {
             actualSubtasksCount += epic.getSubtasks().size();
         }
         System.out.println("Тестирование эпиков. Создание эпиков. Ожидаемое количество подзадач: 3; " +

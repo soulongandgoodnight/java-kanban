@@ -11,7 +11,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private final LinkedList<Task> tasksViewHistory;
     private static final int historyMaxCount = 10;
 
-    public InMemoryHistoryManager(){
+    public InMemoryHistoryManager() {
         tasksViewHistory = new LinkedList<>();
     }
 
