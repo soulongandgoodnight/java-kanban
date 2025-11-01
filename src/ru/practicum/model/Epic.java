@@ -3,6 +3,7 @@ package ru.practicum.model;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 
 public class Epic extends Task {
     private final HashSet<Subtask> subtasks;
@@ -60,12 +61,12 @@ public class Epic extends Task {
     }
 
     private void recalculateTimeAndDuration() {
-        this.startTime = subtasks.stream().map(a -> a.startTime).min(LocalDateTime::compareTo)
+        this.startTime = subtasks.stream().map(a -> a.startTime).filter(Objects::nonNull).min(LocalDateTime::compareTo)
                 .orElse(LocalDateTime.MIN);
-        this.endTime = subtasks.stream().map(Task::getEndTime).max(LocalDateTime::compareTo)
+        this.endTime = subtasks.stream().map(Task::getEndTime).filter(Objects::nonNull).max(LocalDateTime::compareTo)
                 .orElse(LocalDateTime.MIN);
-
-        this.duration = subtasks.stream().map(a -> a.duration).reduce(Duration.ZERO, Duration::plus);
+        this.duration = subtasks.stream().filter(a -> a.duration != null)
+                .map(a -> a.duration).reduce(Duration.ZERO, Duration::plus);
     }
 
     @Override
