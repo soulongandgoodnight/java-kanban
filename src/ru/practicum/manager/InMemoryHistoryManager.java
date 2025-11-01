@@ -22,8 +22,8 @@ public class InMemoryHistoryManager implements HistoryManager {
                 return;
             }
             case Epic epic -> {
-                var epicForHistory = new Epic(epic.getName(), epic.getDescription(), epic.getId(), epic.getStatus()
-                        , epic.getStartTime(), epic.getDuration());
+                var epicForHistory = new Epic(epic.getName(), epic.getDescription(), epic.getId(), epic.getStatus(),
+                        epic.getStartTime(), epic.getDuration());
                 tasksViewHistory.addLast(epicForHistory);
             }
             case Subtask subtask -> {
