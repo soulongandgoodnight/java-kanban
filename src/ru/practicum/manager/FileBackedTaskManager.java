@@ -40,6 +40,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 epic.addSubtask(subtask);
             }
         }
+
+        this.tasksByStartTime.addAll(tasks.values());
+        this.tasksByStartTime.addAll(subtasks.values());
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {

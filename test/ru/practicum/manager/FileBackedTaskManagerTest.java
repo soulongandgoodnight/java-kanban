@@ -53,11 +53,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         // expect
         for (var originalTask : originalManager.tasks.values()) {
             var taskFromFile = managerFromFile.getTask(originalTask.getId());
-
-            Assertions.assertEquals(originalTask.getId(), taskFromFile.getId());
-            Assertions.assertEquals(originalTask.getName(), taskFromFile.getName());
-            Assertions.assertEquals(originalTask.getDescription(), taskFromFile.getDescription());
-            Assertions.assertEquals(originalTask.getStatus(), taskFromFile.getStatus());
+            assertTasksAreEqual(originalTask, taskFromFile);
         }
 
         for (var originalEpic : originalManager.epics.values()) {
@@ -68,6 +64,17 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         for (var originalSubtask : originalManager.subtasks.values()) {
             var subtaskFromFile = managerFromFile.getSubtask(originalSubtask.getId());
             assertSubtasksAreEqual(originalSubtask, subtaskFromFile);
+        }
+
+        var originalPriorityTasks = originalManager.getPrioritizedTasks();
+        var priorityTasksFromFile = managerFromFile.getPrioritizedTasks();
+        Assertions.assertFalse(originalPriorityTasks.isEmpty());
+        Assertions.assertFalse(priorityTasksFromFile.isEmpty());
+        Assertions.assertEquals(originalPriorityTasks.size(), priorityTasksFromFile.size());
+        for (int i = 0; i < originalPriorityTasks.size(); i++) {
+            var originalPriorityTask = originalPriorityTasks.get(i);
+            var priorityTaskFromFile = priorityTasksFromFile.get(i);
+            assertTasksAreEqual(originalPriorityTask, priorityTaskFromFile);
         }
 
         Assertions.assertEquals(originalManager.tasks.size(), managerFromFile.tasks.size());
@@ -112,9 +119,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         var file = new File("abracadabra/dull");
         var manager = new FileBackedTaskManager(file);
         var taskToSave = new Task("name", "description", 0, TaskStatus.NEW, LocalDateTime.MIN, Duration.ZERO);
-        Assertions.assertThrows(ManagerSaveException.class, () -> {
-            manager.createTask(taskToSave);
-        });
+        Assertions.assertThrows(ManagerSaveException.class, () -> manager.createTask(taskToSave));
     }
 
     @Test
