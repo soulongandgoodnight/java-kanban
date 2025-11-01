@@ -11,6 +11,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 
 class FileBackedTaskManagerTest {
@@ -25,9 +27,7 @@ class FileBackedTaskManagerTest {
 
         // expect
         var br = new BufferedReader(new FileReader(file));
-        var actualHeader = br.readLine();
         var actualFileEnd = br.readLine();
-        Assertions.assertEquals(FileBackedTaskManager.FILE_HEADER, actualHeader);
         Assertions.assertNull(actualFileEnd);
 
     }
@@ -61,22 +61,49 @@ class FileBackedTaskManagerTest {
         // expect
         for (var originalTask : originalManager.tasks.values()) {
             var taskFromFile = managerFromFile.getTask(originalTask.getId());
-            Assertions.assertEquals(originalTask, taskFromFile);
+
+            Assertions.assertEquals(originalTask.getId(), taskFromFile.getId());
+            Assertions.assertEquals(originalTask.getName(), taskFromFile.getName());
+            Assertions.assertEquals(originalTask.getDescription(), taskFromFile.getDescription());
+            Assertions.assertEquals(originalTask.getStatus(), taskFromFile.getStatus());
         }
 
         for (var originalEpic : originalManager.epics.values()) {
             var epicFromFile = managerFromFile.getEpic(originalEpic.getId());
-            Assertions.assertEquals(originalEpic, epicFromFile);
+            assertEpicsAreEqual(originalEpic, epicFromFile);
         }
 
         for (var originalSubtask : originalManager.subtasks.values()) {
             var subtaskFromFile = managerFromFile.getSubtask(originalSubtask.getId());
-            Assertions.assertEquals(originalSubtask, subtaskFromFile);
+            assertSubtasksAreEqual(originalSubtask, subtaskFromFile);
         }
 
         Assertions.assertEquals(originalManager.tasks.size(), managerFromFile.tasks.size());
         Assertions.assertEquals(originalManager.epics.size(), managerFromFile.epics.size());
         Assertions.assertEquals(originalManager.subtasks.size(), managerFromFile.subtasks.size());
         Assertions.assertEquals(originalManager.uniqueTaskId, managerFromFile.uniqueTaskId);
+    }
+
+    private void assertTasksAreEqual(Task left, Task right) {
+        Assertions.assertEquals(left.getId(), right.getId());
+        Assertions.assertEquals(left.getName(), right.getName());
+        Assertions.assertEquals(left.getDescription(), right.getDescription());
+        Assertions.assertEquals(left.getStatus(), right.getStatus());
+    }
+
+    private void assertEpicsAreEqual(Epic left, Epic right) {
+        assertTasksAreEqual(left, right);
+        var leftSubtasks = left.getSubtasks().stream().collect(Collectors.toMap(Task::getId, v -> v));
+        var rightSubtasks = right.getSubtasks().stream().collect(Collectors.toMap(Task::getId, v -> v));
+        for (var leftSubtask : leftSubtasks.entrySet()) {
+            var rightSubtask = rightSubtasks.get(leftSubtask.getKey());
+            Assertions.assertNotNull(rightSubtask);
+            assertSubtasksAreEqual(leftSubtask.getValue(), rightSubtask);
+        }
+    }
+
+    private void assertSubtasksAreEqual(Subtask left, Subtask right) {
+        assertTasksAreEqual(left, right);
+        Assertions.assertEquals(left.getEpicId(), right.getEpicId());
     }
 }

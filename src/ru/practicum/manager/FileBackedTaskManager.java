@@ -16,12 +16,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager(File file) {
         super();
         this.file = file;
-        try (var bw = new BufferedWriter(new FileWriter(file, false))) {
-            bw.write(FILE_HEADER);
-            bw.newLine();
-        } catch (IOException e) {
-            throw new ManagerSaveException();
-        }
     }
 
     private FileBackedTaskManager(File file, HashMap<Integer, Task> tasks, HashMap<Integer, Epic> epics,
