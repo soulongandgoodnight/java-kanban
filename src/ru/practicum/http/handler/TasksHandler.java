@@ -29,7 +29,7 @@ public class TasksHandler extends BaseHttpHandler {
             case 2:
                 sendOk(exchange, taskManager.getTasks());
                 break;
-                // `/tasks/{id}`
+            // `/tasks/{id}`
             case 3:
                 var taskId = Integer.parseInt(pathParts[2]);
                 try {

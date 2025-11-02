@@ -15,7 +15,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -43,7 +42,7 @@ class HttpTaskServerTest {
     @Test
     public void testAddTask() throws IOException, InterruptedException {
         // создаём задачу
-        var task = new TaskPojo(null,"Test 2", "Testing task 2",
+        var task = new TaskPojo(null, "Test 2", "Testing task 2",
                 TaskStatus.NEW.toString(), 5, LocalDateTime.now().toString());
         // конвертируем её в JSON
         String taskJson = gson.toJson(task);

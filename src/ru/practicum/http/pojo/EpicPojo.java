@@ -2,9 +2,6 @@ package ru.practicum.http.pojo;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class EpicPojo {
     private Integer id;
@@ -14,7 +11,7 @@ public class EpicPojo {
     private Duration duration;
     private LocalDateTime startTime;
 
-    public EpicPojo(Integer id, String name, String description, String status, Duration duration, LocalDateTime startTime){
+    public EpicPojo(Integer id, String name, String description, String status, Duration duration, LocalDateTime startTime) {
         this.id = id;
         this.name = name;
         this.description = description;

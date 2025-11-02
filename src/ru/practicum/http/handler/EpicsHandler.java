@@ -55,7 +55,7 @@ public class EpicsHandler extends BaseHttpHandler {
             case 2:
                 sendOk(exchange, taskManager.getEpics());
                 break;
-                // `/epics/{id}`
+            // `/epics/{id}`
             case 3:
                 var epicId = Integer.parseInt(pathParts[2]);
                 try {
@@ -65,7 +65,7 @@ public class EpicsHandler extends BaseHttpHandler {
                     this.sendNotFound(exchange);
                 }
                 break;
-                // `/epics/{id}/subtasks`
+            // `/epics/{id}/subtasks`
             case 4:
                 var epicIdForSubtasks = Integer.parseInt(pathParts[2]);
                 try {
@@ -75,7 +75,8 @@ public class EpicsHandler extends BaseHttpHandler {
                     this.sendNotFound(exchange);
                 }
                 break;
-            default: this.sendNotFound(exchange);
+            default:
+                this.sendNotFound(exchange);
         }
     }
 }

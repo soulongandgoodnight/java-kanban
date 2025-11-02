@@ -1,8 +1,5 @@
 package ru.practicum.http.pojo;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 public class TaskPojo {
     private Integer id;
     private String name;
@@ -11,7 +8,7 @@ public class TaskPojo {
     private Integer durationInMinutes;
     private String startTime;
 
-    public TaskPojo(Integer id, String name, String description, String status, Integer durationInMinutes, String startTime){
+    public TaskPojo(Integer id, String name, String description, String status, Integer durationInMinutes, String startTime) {
         this.id = id;
         this.name = name;
         this.description = description;

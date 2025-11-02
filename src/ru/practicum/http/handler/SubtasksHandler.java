@@ -68,7 +68,8 @@ public class SubtasksHandler extends BaseHttpHandler {
                     this.sendNotFound(exchange);
                 }
                 break;
-            default: sendNotFound(exchange);
+            default:
+                sendNotFound(exchange);
         }
     }
 }

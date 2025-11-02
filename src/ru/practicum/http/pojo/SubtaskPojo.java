@@ -12,7 +12,7 @@ public class SubtaskPojo {
     private LocalDateTime startTime;
     private Integer epicId;
 
-    public SubtaskPojo(Integer id, String name, String description, String status, Duration duration, LocalDateTime startTime, Integer epicId){
+    public SubtaskPojo(Integer id, String name, String description, String status, Duration duration, LocalDateTime startTime, Integer epicId) {
         this.id = id;
         this.name = name;
         this.description = description;

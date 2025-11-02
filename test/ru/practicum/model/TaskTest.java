@@ -2,7 +2,6 @@ package ru.practicum.model;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import ru.practicum.http.pojo.TaskPojo;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

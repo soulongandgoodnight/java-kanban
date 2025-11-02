@@ -13,10 +13,14 @@ public abstract class BaseHttpHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         var method = exchange.getRequestMethod();
         switch (method) {
-            case "GET": handleGetRequest(exchange);
-            case "POST": handlePostRequest(exchange);
-            case "DELETE": handleDeleteRequest(exchange);
-            default: this.sendNotFound(exchange);
+            case "GET":
+                handleGetRequest(exchange);
+            case "POST":
+                handlePostRequest(exchange);
+            case "DELETE":
+                handleDeleteRequest(exchange);
+            default:
+                this.sendNotFound(exchange);
         }
     }
 
