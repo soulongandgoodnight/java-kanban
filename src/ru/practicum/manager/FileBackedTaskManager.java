@@ -41,8 +41,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
         }
 
-        this.tasksByStartTime.addAll(tasks.values());
-        this.tasksByStartTime.addAll(subtasks.values());
+        this.tasksByStartTime.addAll(tasks.values().stream().filter(t -> t.getStartTime() != null).toList());
+        this.tasksByStartTime.addAll(subtasks.values().stream().filter(s -> s.getStartTime() != null).toList());
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
