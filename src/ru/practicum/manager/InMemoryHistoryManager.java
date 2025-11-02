@@ -17,23 +17,35 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-        if (task == null) {
-            return;
-        } else if (task instanceof Epic epic) {
-            var epicForHistory = new Epic(epic.getName(), epic.getDescription(), epic.getId(), epic.getStatus());
-            tasksViewHistory.addLast(epicForHistory);
-        } else if (task instanceof Subtask subtask) {
-            var subtaskForHistory = new Subtask(subtask.getName(), subtask.getDescription(), subtask.getId(),
-                    subtask.getStatus(), subtask.getEpicId());
-            tasksViewHistory.addLast(subtaskForHistory);
-        } else {
-            var taskForHistory = new Task(task.getName(), task.getDescription(), task.getId(), task.getStatus());
-            tasksViewHistory.addLast(taskForHistory);
+        switch (task) {
+            case null -> {
+                return;
+            }
+            case Epic epic -> {
+                var epicForHistory = new Epic(epic.getName(), epic.getDescription(), epic.getId(), epic.getStatus(),
+                        epic.getStartTime(), epic.getDuration());
+                tasksViewHistory.addLast(epicForHistory);
+            }
+            case Subtask subtask -> {
+                var subtaskForHistory = new Subtask(subtask.getName(), subtask.getDescription(), subtask.getId(),
+                        subtask.getStatus(), subtask.getEpicId(), subtask.getStartTime(), subtask.getDuration());
+                tasksViewHistory.addLast(subtaskForHistory);
+            }
+            default -> {
+                var taskForHistory = new Task(task.getName(), task.getDescription(), task.getId(), task.getStatus(),
+                        task.getStartTime(), task.getDuration());
+                tasksViewHistory.addLast(taskForHistory);
+            }
         }
 
         if (tasksViewHistory.size() > historyMaxCount) {
             tasksViewHistory.removeFirst();
         }
+    }
+
+    @Override
+    public void remove(Task task) {
+        tasksViewHistory.remove(task);
     }
 
     @Override

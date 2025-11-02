@@ -7,6 +7,8 @@ import ru.practicum.model.Subtask;
 import ru.practicum.model.Task;
 import ru.practicum.model.TaskStatus;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 
 public class Main {
@@ -18,8 +20,10 @@ public class Main {
     }
 
     private static void testTasksFlow(TaskManager taskManager) {
-        var task1 = new Task("Задача 1", "Описание задачи 1", 0, TaskStatus.NEW);
-        var task2 = new Task("Задача 2", "Описание задачи 2", 0, TaskStatus.NEW);
+        var task1 = new Task("Задача 1", "Описание задачи 1", 0, TaskStatus.NEW,
+                LocalDateTime.now(), Duration.ofHours(3));
+        var task2 = new Task("Задача 2", "Описание задачи 2", 0, TaskStatus.NEW,
+                LocalDateTime.now(), Duration.ofHours(3));
         var task1Id = taskManager.createTask(task1);
         taskManager.createTask(task2);
         var allTasks = taskManager.getAllTasks();
@@ -29,7 +33,7 @@ public class Main {
 
         var taskForUpdate = taskManager.getTask(task1Id);
         var updatedTask1 = new Task(taskForUpdate.getName(), taskForUpdate.getDescription(), taskForUpdate.getId(),
-                TaskStatus.IN_PROGRESS);
+                TaskStatus.IN_PROGRESS, LocalDateTime.now(), Duration.ofHours(3));
         taskManager.updateTask(updatedTask1);
 
         var actualUpdatedTask = taskManager.getAllTasks().stream()
@@ -54,16 +58,18 @@ public class Main {
     private static void testEpicsFlow(TaskManager taskManager) {
         HashSet<Subtask> subtasks1 = new HashSet<>();
         subtasks1.add(new Subtask("Подзадача первого эпика 1", "Описание подзадачи 1", 0,
-                TaskStatus.NEW, 1));
+                TaskStatus.NEW, 1, LocalDateTime.now(), Duration.ofHours(3)));
         subtasks1.add(new Subtask("Подзадача певолшл эпика 2", "Описание подзадачи 2", 1,
-                TaskStatus.NEW, 1));
-        Epic epic1 = new Epic("Эпик 1", "Описание эпика 1", 0, TaskStatus.NEW);
+                TaskStatus.NEW, 1, LocalDateTime.now(), Duration.ofHours(3)));
+        Epic epic1 = new Epic("Эпик 1", "Описание эпика 1", 0, TaskStatus.NEW,
+                LocalDateTime.now(), Duration.ofHours(3));
         var epic1Id = taskManager.createEpic(epic1);
 
         HashSet<Subtask> subtasks2 = new HashSet<>();
         subtasks2.add(new Subtask("Подзадача второго эпика", "Описание подзадачи 1", 0,
-                TaskStatus.NEW, 2));
-        Epic epic2 = new Epic("Эпик 2", "Описание эпика 2", 0, TaskStatus.NEW);
+                TaskStatus.NEW, 2, LocalDateTime.now(), Duration.ofHours(3)));
+        Epic epic2 = new Epic("Эпик 2", "Описание эпика 2", 0, TaskStatus.NEW, LocalDateTime.now(),
+                Duration.ofHours(3));
         taskManager.createEpic(epic2);
 
         var allEpics = taskManager.getAllEpics();
@@ -90,7 +96,7 @@ public class Main {
                 + "; Полученный эпик: " + actualEpicById);
 
         var epicForStatusUpdate = new Epic(actualEpicById.getName(), actualEpicById.getDescription(), actualEpicById.getId(),
-                TaskStatus.DONE);
+                TaskStatus.DONE, LocalDateTime.now(), Duration.ofHours(3));
         taskManager.updateEpic(epicForStatusUpdate);
         var actualEpicForStatusUpdate = taskManager.getEpic(epicForStatusUpdate.getId());
         System.out.println("Тестирование эпиков. Обновление статуса эпика. Ожидаемый статус: " + TaskStatus.NEW

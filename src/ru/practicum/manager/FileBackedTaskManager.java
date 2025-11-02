@@ -5,12 +5,14 @@ import ru.practicum.exception.ManagerSaveException;
 import ru.practicum.model.*;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    public static final String FILE_HEADER = "id,type,name,status,description,epic";
+    public static final String FILE_HEADER = "id,type,name,status,description,startTime,duration,epic";
     private final File file;
 
     public FileBackedTaskManager(File file) {
@@ -38,6 +40,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 epic.addSubtask(subtask);
             }
         }
+
+        this.tasksByStartTime.addAll(tasks.values().stream().filter(t -> t.getStartTime() != null).toList());
+        this.tasksByStartTime.addAll(subtasks.values().stream().filter(s -> s.getStartTime() != null).toList());
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
@@ -149,11 +154,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private String toString(Task task) {
         if (task instanceof Subtask subtask) {
-            return String.format("%s,%s,%s,%s,%s,%s", subtask.getId(), task.getTaskType(), subtask.getName(),
-                    subtask.getStatus(), subtask.getDescription(), subtask.getEpicId());
+            return String.format("%s,%s,%s,%s,%s,%s,%s,%s", subtask.getId(), task.getTaskType(), subtask.getName(),
+                    subtask.getStatus(), subtask.getDescription(), subtask.getStartTime(), subtask.getDuration(),
+                    subtask.getEpicId());
         } else {
-            return String.format("%s,%s,%s,%s,%s,", task.getId(), task.getTaskType(), task.getName(),
-                    task.getStatus(), task.getDescription());
+            return String.format("%s,%s,%s,%s,%s,%s,%s,", task.getId(), task.getTaskType(), task.getName(),
+                    task.getStatus(), task.getDescription(), task.getStartTime(), task.getDuration());
         }
     }
 
@@ -161,13 +167,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Task result;
         var stringParts = value.split(",");
         var taskType = TaskType.valueOf(stringParts[1]);
+        var startTime = LocalDateTime.parse(stringParts[5]);
+        var duration = Duration.parse(stringParts[6]);
         switch (taskType) {
             case SUBTASK -> result = new Subtask(stringParts[2], stringParts[4], Integer.parseInt(stringParts[0]),
-                    TaskStatus.valueOf(stringParts[3]), Integer.parseInt(stringParts[5]));
+                    TaskStatus.valueOf(stringParts[3]), Integer.parseInt(stringParts[7]), startTime, duration);
             case EPIC -> result = new Epic(stringParts[2], stringParts[4], Integer.parseInt(stringParts[0]),
-                    TaskStatus.valueOf(stringParts[3]));
+                    TaskStatus.valueOf(stringParts[3]), startTime, duration);
             default -> result = new Task(stringParts[2], stringParts[4], Integer.parseInt(stringParts[0]),
-                    TaskStatus.valueOf(stringParts[3]));
+                    TaskStatus.valueOf(stringParts[3]), startTime, duration);
         }
 
         return result;
