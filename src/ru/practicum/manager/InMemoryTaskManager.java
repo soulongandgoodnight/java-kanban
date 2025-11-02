@@ -1,5 +1,8 @@
 package ru.practicum.manager;
 
+import ru.practicum.exception.IntersectedWIthOtherTasksException;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.RelatedEpicNotFoundException;
 import ru.practicum.model.Epic;
 import ru.practicum.model.Subtask;
 import ru.practicum.model.Task;
@@ -28,29 +31,29 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<Task> getAllTasks() {
+    public List<Task> getTasks() {
         return new ArrayList<>(tasks.values());
     }
 
     @Override
-    public List<Epic> getAllEpics() {
+    public List<Epic> getEpics() {
         return new ArrayList<>(epics.values());
     }
 
     @Override
-    public List<Subtask> getAllSubtasks() {
+    public List<Subtask> getSubtasks() {
         return new ArrayList<>(subtasks.values());
     }
 
     @Override
-    public void deleteAllTasks() {
+    public void deleteTasks() {
         tasks.values().forEach(tasksByStartTime::remove);
         tasks.values().forEach(historyManager::remove);
         tasks.clear();
     }
 
     @Override
-    public void deleteAllEpics() {
+    public void deleteEpics() {
         epics.values().forEach(historyManager::remove);
         epics.clear();
         subtasks.values().forEach(tasksByStartTime::remove);
@@ -59,7 +62,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteAllSubtasks() {
+    public void deleteSubtasks() {
         subtasks.values().forEach(tasksByStartTime::remove);
         subtasks.values().forEach(historyManager::remove);
         subtasks.clear();
@@ -91,9 +94,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public int createTask(Task task) {
+    public int createTask(Task task) throws IntersectedWIthOtherTasksException {
         if (task.getStartTime() != null && isTaskIntersectsWithExistingTasks(task)) {
-            return -1;
+            throw new IntersectedWIthOtherTasksException();
         }
 
         var taskId = this.getUniqueTaskId();
@@ -116,14 +119,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public int createSubtask(Subtask subtask) {
-        if (subtask.getStartTime() != null && isTaskIntersectsWithExistingTasks(subtask)) {
-            return -1;
-        }
-
+    public int createSubtask(Subtask subtask) throws IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         var existingEpic = epics.get(subtask.getEpicId());
         if (existingEpic == null || subtask.getId() == existingEpic.getId()) {
-            return -1;
+            throw new RelatedEpicNotFoundException();
+        }
+
+        if (subtask.getStartTime() != null && isTaskIntersectsWithExistingTasks(subtask)) {
+            throw new IntersectedWIthOtherTasksException();
         }
 
         var subtaskId = this.getUniqueTaskId();
@@ -139,9 +142,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Task task) {
+    public void updateTask(Task task) throws IntersectedWIthOtherTasksException {
         if (task.getStartTime() != null && isTaskIntersectsWithExistingTasks(task)) {
-            return;
+            throw new IntersectedWIthOtherTasksException();
         }
 
         if (tasks.containsKey(task.getId())) {
@@ -154,11 +157,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateEpic(Epic epic) {
+    public void updateEpic(Epic epic) throws NotFoundException {
         var epicId = epic.getId();
         var existingEpic = this.epics.get(epicId);
         if (existingEpic == null) {
-            return;
+            throw new NotFoundException();
         }
 
         existingEpic.setName(epic.getName());
@@ -166,15 +169,20 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
-        if (subtask.getStartTime() != null && isTaskIntersectsWithExistingTasks(subtask)) {
-            return;
-        }
-
+    public void updateSubtask(Subtask subtask) throws IntersectedWIthOtherTasksException, NotFoundException,
+            RelatedEpicNotFoundException {
         var existingSubtask = subtasks.get(subtask.getId());
         var existingEpic = epics.get(subtask.getEpicId());
-        if (existingSubtask == null || existingEpic == null) {
-            return;
+        if (existingSubtask == null) {
+            throw new NotFoundException();
+        }
+
+        if (existingEpic == null) {
+            throw new RelatedEpicNotFoundException();
+        }
+
+        if (subtask.getStartTime() != null && isTaskIntersectsWithExistingTasks(subtask)) {
+            throw new IntersectedWIthOtherTasksException();
         }
 
         subtasks.put(subtask.getId(), subtask);
@@ -234,11 +242,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Subtask> getSubtasksByEpic(int epicId) {
+    public ArrayList<Subtask> getSubtasksByEpic(int epicId) throws NotFoundException {
         var epic = epics.get(epicId);
 
         if (epic == null) {
-            return new ArrayList<>();
+            throw new NotFoundException();
         }
 
         return new ArrayList<>(epic.getSubtasks());

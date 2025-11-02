@@ -3,8 +3,10 @@ package ru.practicum.manager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.practicum.exception.IntersectedWIthOtherTasksException;
 import ru.practicum.exception.ManagerLoadException;
 import ru.practicum.exception.ManagerSaveException;
+import ru.practicum.exception.RelatedEpicNotFoundException;
 import ru.practicum.model.Epic;
 import ru.practicum.model.Subtask;
 import ru.practicum.model.Task;
@@ -42,7 +44,8 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     }
 
     @Test
-    void when_addsDifferentTasksToManagerAndOtherManagerLoadsFromTheSameFile_should_beEqual() throws IOException {
+    void when_addsDifferentTasksToManagerAndOtherManagerLoadsFromTheSameFile_should_beEqual() throws IOException,
+            IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         // given
         var file = File.createTempFile("test", "FileBackedTaskManager");
 
@@ -83,7 +86,8 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         Assertions.assertEquals(originalManager.uniqueTaskId, managerFromFile.uniqueTaskId);
     }
 
-    private FileBackedTaskManager getFileBackedTaskManager(File file) {
+    private FileBackedTaskManager getFileBackedTaskManager(File file) throws IntersectedWIthOtherTasksException,
+            RelatedEpicNotFoundException {
         var originalManager = new FileBackedTaskManager(file);
         var task1 = new Task("Задача 1", "Описание задачи 1", 0, TaskStatus.NEW,
                 LocalDateTime.now(), Duration.ofHours(3));

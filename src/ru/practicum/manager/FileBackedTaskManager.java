@@ -1,7 +1,6 @@
 package ru.practicum.manager;
 
-import ru.practicum.exception.ManagerLoadException;
-import ru.practicum.exception.ManagerSaveException;
+import ru.practicum.exception.*;
 import ru.practicum.model.*;
 
 import java.io.*;
@@ -9,6 +8,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -73,7 +73,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public int createTask(Task task) {
+    public int createTask(Task task) throws IntersectedWIthOtherTasksException {
         var taskId = super.createTask(task);
         save();
         return taskId;
@@ -87,26 +87,26 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public int createSubtask(Subtask subtask) {
+    public int createSubtask(Subtask subtask) throws IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         var subtaskId = super.createSubtask(subtask);
         save();
         return subtaskId;
     }
 
     @Override
-    public void updateTask(Task task) {
+    public void updateTask(Task task) throws IntersectedWIthOtherTasksException {
         super.updateTask(task);
         save();
     }
 
     @Override
-    public void updateEpic(Epic epic) {
+    public void updateEpic(Epic epic) throws NotFoundException {
         super.updateEpic(epic);
         save();
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
+    public void updateSubtask(Subtask subtask) throws NotFoundException, IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         super.updateSubtask(subtask);
         save();
     }

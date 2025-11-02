@@ -1,5 +1,8 @@
 package ru.practicum.manager;
 
+import ru.practicum.exception.IntersectedWIthOtherTasksException;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.RelatedEpicNotFoundException;
 import ru.practicum.model.Epic;
 import ru.practicum.model.Subtask;
 import ru.practicum.model.Task;
@@ -7,35 +10,35 @@ import ru.practicum.model.Task;
 import java.util.List;
 
 public interface TaskManager {
-    List<Task> getAllTasks();
+    List<Task> getTasks();
 
-    List<Epic> getAllEpics();
+    List<Epic> getEpics();
 
-    List<Subtask> getAllSubtasks();
+    List<Subtask> getSubtasks();
 
-    void deleteAllTasks();
+    void deleteTasks();
 
-    void deleteAllEpics();
+    void deleteEpics();
 
-    void deleteAllSubtasks();
+    void deleteSubtasks();
 
-    Task getTask(int id);
+    Task getTask(int id) throws NotFoundException;
 
-    Epic getEpic(int id);
+    Epic getEpic(int id) throws NotFoundException;
 
-    Subtask getSubtask(int id);
+    Subtask getSubtask(int id) throws NotFoundException;
 
-    int createTask(Task task);
+    int createTask(Task task) throws IntersectedWIthOtherTasksException;
 
     int createEpic(Epic epic);
 
-    int createSubtask(Subtask subtask);
+    int createSubtask(Subtask subtask) throws IntersectedWIthOtherTasksException, RelatedEpicNotFoundException;
 
-    void updateTask(Task task);
+    void updateTask(Task task) throws NotFoundException, IntersectedWIthOtherTasksException;
 
-    void updateEpic(Epic epic);
+    void updateEpic(Epic epic) throws NotFoundException;
 
-    void updateSubtask(Subtask subtask);
+    void updateSubtask(Subtask subtask) throws NotFoundException, IntersectedWIthOtherTasksException, RelatedEpicNotFoundException;
 
     void deleteTask(int identifier);
 
@@ -43,7 +46,7 @@ public interface TaskManager {
 
     void deleteSubtask(int identifier);
 
-    List<Subtask> getSubtasksByEpic(int epicId);
+    List<Subtask> getSubtasksByEpic(int epicId) throws NotFoundException;
 
     List<Task> getHistory();
 

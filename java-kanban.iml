@@ -19,6 +19,7 @@
           <root url="jar://$MODULE_DIR$/lib/junit-jupiter-params-5.8.1.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/junit-jupiter-engine-5.8.1.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/junit-platform-engine-1.8.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/gson-2.9.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

@@ -2,6 +2,9 @@ package ru.practicum.manager;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import ru.practicum.exception.IntersectedWIthOtherTasksException;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.RelatedEpicNotFoundException;
 import ru.practicum.model.Epic;
 import ru.practicum.model.Subtask;
 import ru.practicum.model.Task;
@@ -10,6 +13,7 @@ import ru.practicum.model.TaskStatus;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -18,7 +22,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     protected T taskManager;
 
     @Test
-    public void shouldNotAddEpicAsSubtask() {
+    public void shouldNotAddEpicAsSubtask() throws IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         var epicId = 29302;
         var epic = new Epic("Epic for tests name", "Epic for tests description", epicId, TaskStatus.NEW,
                 LocalDateTime.now(), Duration.ofHours(3));
@@ -27,26 +31,26 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createEpic(epic);
         var subtaskId = taskManager.createSubtask(epicAsSubtask);
 
-        Assertions.assertEquals(-1, subtaskId, "Подзадача не должна быть создана");
-        Assertions.assertEquals(0, taskManager.getAllSubtasks().size(), "Подзадача не должна быть создана");
-        Assertions.assertEquals(0, taskManager.getSubtasksByEpic(epicId).size(), "Подзадача не должна быть создана");
+        Assertions.assertEquals(Optional.empty(), subtaskId, "Подзадача не должна быть создана");
+        Assertions.assertEquals(0, taskManager.getSubtasks().size(), "Подзадача не должна быть создана");
+        Assertions.assertThrows(NotFoundException.class, () -> taskManager.getSubtasksByEpic(epicId));
     }
 
 
     @Test
-    public void shouldNotConflictWithIdsWhenCreateTasks() {
+    public void shouldNotConflictWithIdsWhenCreateTasks() throws IntersectedWIthOtherTasksException {
         var taskId = 12312312;
         var task = new Task("name", "description", taskId, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         taskManager.createTask(task);
-        var allTasks = taskManager.getAllTasks();
+        var allTasks = taskManager.getTasks();
         Assertions.assertEquals(1, allTasks.size(), "Должна быть создана только 1 задача");
         var createdTask = allTasks.stream().findFirst().get();
         Assertions.assertNotEquals(taskId, createdTask.getId(), "Идентификатор задачи должен контрилироваться менеджером");
     }
 
     @Test
-    public void shouldNotChangeTaskWhenAddingTaskByManager() {
+    public void shouldNotChangeTaskWhenAddingTaskByManager() throws NotFoundException, IntersectedWIthOtherTasksException {
         var expectedTask = new Task("name", "description", 123213, TaskStatus.NEW,
                 LocalDateTime.now(), Duration.ofHours(3));
         var newTaskId = taskManager.createTask(expectedTask);
@@ -57,7 +61,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void shouldSavePreviousStateOfTaskWhenTaskIsUpdated() {
+    public void shouldSavePreviousStateOfTaskWhenTaskIsUpdated() throws NotFoundException, IntersectedWIthOtherTasksException {
         var expectedTask = new Task("Original name", "Original description", 123213, TaskStatus.NEW,
                 LocalDateTime.now(), Duration.ofHours(3));
         var expectedTaskId = taskManager.createTask(expectedTask);
@@ -74,7 +78,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void shouldReturnThreeTasksWhenAddedThreeTasks() {
+    public void shouldReturnThreeTasksWhenAddedThreeTasks() throws IntersectedWIthOtherTasksException {
         var task1 = new Task("name", "description", 1, TaskStatus.NEW,
                 LocalDateTime.of(2025, 1, 1, 0, 0), Duration.ofHours(3));
         var task2 = new Task("name", "description", 2, TaskStatus.NEW,
@@ -89,7 +93,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
             taskManager.createTask(expectedTask);
         }
 
-        var allTasks = taskManager.getAllTasks();
+        var allTasks = taskManager.getTasks();
 
         Assertions.assertEquals(expectedTasks, allTasks, "Тестовые задачи и задачи от менеджера отличаются");
     }
@@ -110,13 +114,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
             taskManager.createEpic(expectedEpic);
         }
 
-        var allEpics = taskManager.getAllEpics();
+        var allEpics = taskManager.getEpics();
 
         Assertions.assertEquals(expectedEpics, allEpics, "Тестовые эпики и эпики от менеджера отличаются");
     }
 
     @Test
-    public void shouldReturnThreeSubtasksWhenAddedThreeSubtasks() {
+    public void shouldReturnThreeSubtasksWhenAddedThreeSubtasks() throws IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         var epic = new Epic("name", "description", 1, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         var subtask1 = new Subtask("name", "description", 2, TaskStatus.NEW, epic.getId(),
@@ -135,13 +139,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
             taskManager.createSubtask(subtask);
         }
 
-        var allSubtasks = taskManager.getAllSubtasks();
+        var allSubtasks = taskManager.getSubtasks();
 
         Assertions.assertEquals(expectedSubtasks, allSubtasks, "Тестовые подзадачи и подзадачи от менеджера отличаются");
     }
 
     @Test
-    public void shouldDeleteAllTasks() {
+    public void shouldDeleteAllTasks() throws IntersectedWIthOtherTasksException {
         var task1 = new Task("name", "description", 1, TaskStatus.NEW,
                 LocalDateTime.of(2025, 1, 1, 0, 0), Duration.ofHours(3));
         var task2 = new Task("name", "description", 2, TaskStatus.NEW,
@@ -151,13 +155,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(task1);
         taskManager.createTask(task2);
         taskManager.createTask(task3);
-        Assertions.assertEquals(3, taskManager.getAllTasks().size(), "Количество созданных задач должно быть 3");
-        taskManager.deleteAllTasks();
-        Assertions.assertEquals(0, taskManager.getAllTasks().size(), "Все задачи должны быть удалены");
+        Assertions.assertEquals(3, taskManager.getTasks().size(), "Количество созданных задач должно быть 3");
+        taskManager.deleteTasks();
+        Assertions.assertEquals(0, taskManager.getTasks().size(), "Все задачи должны быть удалены");
     }
 
     @Test
-    public void shouldDeleteAllEpics() {
+    public void shouldDeleteAllEpics() throws IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         var epic1 = new Epic("name", "description", 1, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         var epic2 = new Epic("name", "description", 2, TaskStatus.NEW, LocalDateTime.now(),
@@ -176,14 +180,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
         taskManager.createSubtask(subtask3);
-        Assertions.assertEquals(3, taskManager.getAllEpics().size(), "Количество созданных эпиков должно быть 3");
-        taskManager.deleteAllEpics();
-        Assertions.assertEquals(0, taskManager.getAllEpics().size(), "Все эпики должны быть удалены");
-        Assertions.assertEquals(0, taskManager.getAllSubtasks().size(), "Все подзадачи должны быть удалены");
+        Assertions.assertEquals(3, taskManager.getEpics().size(), "Количество созданных эпиков должно быть 3");
+        taskManager.deleteEpics();
+        Assertions.assertEquals(0, taskManager.getEpics().size(), "Все эпики должны быть удалены");
+        Assertions.assertEquals(0, taskManager.getSubtasks().size(), "Все подзадачи должны быть удалены");
     }
 
     @Test
-    public void shouldDeleteAllSubtasks() {
+    public void shouldDeleteAllSubtasks() throws IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         var epic = new Epic("name", "description", 1, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         var subtask1 = new Subtask("name", "description", 2, TaskStatus.NEW, epic.getId(),
@@ -197,14 +201,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask2);
         taskManager.createSubtask(subtask3);
 
-        Assertions.assertEquals(3, taskManager.getAllSubtasks().size(), "Количество созданных подзадач должно быть 3");
-        taskManager.deleteAllSubtasks();
-        Assertions.assertEquals(0, taskManager.getAllSubtasks().size(), "Все подзадачи должны быть удалены");
-        Assertions.assertEquals(1, taskManager.getAllEpics().size(), "Эпик не должен удалиться");
+        Assertions.assertEquals(3, taskManager.getSubtasks().size(), "Количество созданных подзадач должно быть 3");
+        taskManager.deleteSubtasks();
+        Assertions.assertEquals(0, taskManager.getSubtasks().size(), "Все подзадачи должны быть удалены");
+        Assertions.assertEquals(1, taskManager.getEpics().size(), "Эпик не должен удалиться");
     }
 
     @Test
-    public void shouldReturnTaskById() {
+    public void shouldReturnTaskById() throws NotFoundException, IntersectedWIthOtherTasksException {
         var task = new Task("name", "description", 1231242, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         var taskId = taskManager.createTask(task);
@@ -213,7 +217,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void shouldReturnEpicById() {
+    public void shouldReturnEpicById() throws NotFoundException {
         var epic = new Epic("name", "description", 1, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         var epicId = taskManager.createEpic(epic);
@@ -223,7 +227,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void shouldReturnSubtaskById() {
+    public void shouldReturnSubtaskById() throws NotFoundException, IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         var epic = new Epic("name", "description", 123213, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         var epicId = taskManager.createEpic(epic);
@@ -235,7 +239,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void shouldCalculateCorrectStatusForEpic_whenSubtasksAreNew() {
+    public void shouldCalculateCorrectStatusForEpic_whenSubtasksAreNew() throws NotFoundException, IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         var epic = new Epic("name", "description", 0, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         var epicId = taskManager.createEpic(epic);
@@ -255,7 +259,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void shouldCalculateCorrectStatusForEpic_whenSubtasksAreDone() {
+    public void shouldCalculateCorrectStatusForEpic_whenSubtasksAreDone() throws NotFoundException,
+            IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         var epic = new Epic("name", "description", 0, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         var epicId = taskManager.createEpic(epic);
@@ -275,7 +280,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void shouldCalculateCorrectStatusForEpic_whenSubtasksAreNewAndDone() {
+    public void shouldCalculateCorrectStatusForEpic_whenSubtasksAreNewAndDone() throws NotFoundException,
+            IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         var epic = new Epic("name", "description", 0, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         var epicId = taskManager.createEpic(epic);
@@ -295,7 +301,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void shouldCalculateCorrectStatusForEpic_whenSubtasksAreInProgress() {
+    public void shouldCalculateCorrectStatusForEpic_whenSubtasksAreInProgress() throws NotFoundException,
+            IntersectedWIthOtherTasksException, RelatedEpicNotFoundException {
         var epic = new Epic("name", "description", 0, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         var epicId = taskManager.createEpic(epic);
@@ -315,7 +322,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void epicShouldHaveLinkedSubtasks() {
+    public void epicShouldHaveLinkedSubtasks() throws NotFoundException, IntersectedWIthOtherTasksException,
+            RelatedEpicNotFoundException {
         var epic = new Epic("name", "description", 0, TaskStatus.NEW, LocalDateTime.now(),
                 Duration.ofHours(3));
         var epicId = taskManager.createEpic(epic);
@@ -329,10 +337,16 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask2);
 
         var actualEpic = taskManager.getEpic(epicId);
-        var allSubtasks = taskManager.getAllSubtasks();
+        var allSubtasks = taskManager.getSubtasks();
         assertSubtaskSetsAreEqual(actualEpic.getSubtasks().stream(), allSubtasks.stream());
-        allSubtasks.forEach(subtask -> assertEpicsAreEqual(actualEpic,
-                taskManager.getEpic(subtask.getEpicId())));
+        allSubtasks.forEach(subtask -> {
+            try {
+                assertEpicsAreEqual(actualEpic,
+                        taskManager.getEpic(subtask.getEpicId()));
+            } catch (NotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Test
@@ -347,8 +361,20 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 "description #" + i, 0, TaskStatus.NEW, epicId,
                 LocalDateTime.of(2025, 1, i, 0, 0), Duration.ofHours(3)));
 
-        subtasks.forEach(subtask -> taskManager.createSubtask(subtask));
-        tasks.forEach(task -> taskManager.createTask(task));
+        subtasks.forEach(subtask -> {
+            try {
+                taskManager.createSubtask(subtask);
+            } catch (IntersectedWIthOtherTasksException | RelatedEpicNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        tasks.forEach(task -> {
+            try {
+                taskManager.createTask(task);
+            } catch (IntersectedWIthOtherTasksException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         var previousStartTime = LocalDateTime.MIN;
         var prioritizedTasks = taskManager.getPrioritizedTasks();
@@ -360,7 +386,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void should_notAddTask_whenTimeIntersectsWithExistingTask() {
+    public void should_notAddTask_whenTimeIntersectsWithExistingTask() throws IntersectedWIthOtherTasksException {
         var existingTask = new Task("task #1", "description #1", 0, TaskStatus.NEW,
                 LocalDateTime.of(2025, 6, 10, 0, 0), Duration.ofHours(3));
 
@@ -379,7 +405,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(taskOverlapsFromBothSides);
         taskManager.createTask(taskIncludedInExistingTask);
 
-        var allTasks = taskManager.getAllTasks();
+        var allTasks = taskManager.getTasks();
         Assertions.assertEquals(1, allTasks.size());
         Assertions.assertEquals(existingTaskId, allTasks.stream().findFirst().get().getId());
     }
