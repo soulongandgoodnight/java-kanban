@@ -29,9 +29,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         var epicAsSubtask = new Subtask("Subtask name", "Subtask description", epicId, TaskStatus.NEW,
                 epicId, LocalDateTime.now(), Duration.ofHours(3));
         taskManager.createEpic(epic);
-        var subtaskId = taskManager.createSubtask(epicAsSubtask);
-
-        Assertions.assertEquals(Optional.empty(), subtaskId, "Подзадача не должна быть создана");
+        Assertions.assertThrows(RelatedEpicNotFoundException.class, () -> taskManager.createSubtask(epicAsSubtask));
         Assertions.assertEquals(0, taskManager.getSubtasks().size(), "Подзадача не должна быть создана");
         Assertions.assertThrows(NotFoundException.class, () -> taskManager.getSubtasksByEpic(epicId));
     }
@@ -400,10 +398,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.of(2025, 6, 10, 1, 0), Duration.ofHours(1));
 
         var existingTaskId = taskManager.createTask(existingTask);
-        taskManager.createTask(taskOverlapsFromLeft);
-        taskManager.createTask(taskOverlapsFromRight);
-        taskManager.createTask(taskOverlapsFromBothSides);
-        taskManager.createTask(taskIncludedInExistingTask);
+        Assertions.assertThrows(IntersectedWIthOtherTasksException.class, () -> taskManager.createTask(taskOverlapsFromLeft));
+        Assertions.assertThrows(IntersectedWIthOtherTasksException.class, () -> taskManager.createTask(taskOverlapsFromRight));
+        Assertions.assertThrows(IntersectedWIthOtherTasksException.class, () -> taskManager.createTask(taskOverlapsFromBothSides));
+        Assertions.assertThrows(IntersectedWIthOtherTasksException.class, () -> taskManager.createTask(taskIncludedInExistingTask));
 
         var allTasks = taskManager.getTasks();
         Assertions.assertEquals(1, allTasks.size());
