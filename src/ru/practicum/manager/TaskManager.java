@@ -1,8 +1,5 @@
 package ru.practicum.manager;
 
-import ru.practicum.exception.IntersectedWIthOtherTasksException;
-import ru.practicum.exception.NotFoundException;
-import ru.practicum.exception.RelatedEpicNotFoundException;
 import ru.practicum.model.Epic;
 import ru.practicum.model.Subtask;
 import ru.practicum.model.Task;
@@ -22,23 +19,23 @@ public interface TaskManager {
 
     void deleteSubtasks();
 
-    Task getTask(int id) throws NotFoundException;
+    Task getTask(int id);
 
-    Epic getEpic(int id) throws NotFoundException;
+    Epic getEpic(int id);
 
-    Subtask getSubtask(int id) throws NotFoundException;
+    Subtask getSubtask(int id);
 
-    int createTask(Task task) throws IntersectedWIthOtherTasksException;
+    int createTask(Task task);
 
     int createEpic(Epic epic);
 
-    int createSubtask(Subtask subtask) throws IntersectedWIthOtherTasksException, RelatedEpicNotFoundException;
+    int createSubtask(Subtask subtask);
 
-    void updateTask(Task task) throws NotFoundException, IntersectedWIthOtherTasksException;
+    void updateTask(Task task);
 
-    void updateEpic(Epic epic) throws NotFoundException;
+    void updateEpic(Epic epic);
 
-    void updateSubtask(Subtask subtask) throws NotFoundException, IntersectedWIthOtherTasksException, RelatedEpicNotFoundException;
+    void updateSubtask(Subtask subtask);
 
     void deleteTask(int identifier);
 
@@ -46,7 +43,7 @@ public interface TaskManager {
 
     void deleteSubtask(int identifier);
 
-    List<Subtask> getSubtasksByEpic(int epicId) throws NotFoundException;
+    List<Subtask> getSubtasksByEpic(int epicId);
 
     List<Task> getHistory();
 

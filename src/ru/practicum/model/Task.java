@@ -7,12 +7,12 @@ import java.util.Objects;
 public class Task {
     protected String name;
     protected String description;
-    protected int id;
+    protected Integer id;
     protected TaskStatus status;
     protected Duration duration;
     protected LocalDateTime startTime;
 
-    public Task(String name, String description, int id, TaskStatus status, LocalDateTime startTime, Duration duration) {
+    public Task(String name, String description, Integer id, TaskStatus status, LocalDateTime startTime, Duration duration) {
         this.name = name;
         this.description = description;
         this.id = id;
@@ -32,7 +32,7 @@ public class Task {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Task task)) return false;
-        return id == task.id;
+        return Objects.equals(id, task.id);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class Task {
         return TaskType.TASK;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

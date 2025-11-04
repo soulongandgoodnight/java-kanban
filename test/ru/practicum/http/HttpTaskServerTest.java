@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.practicum.http.pojo.TaskPojo;
+import ru.practicum.gson.Gsons;
 import ru.practicum.manager.InMemoryTaskManager;
 import ru.practicum.manager.TaskManager;
 import ru.practicum.model.Task;
@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,12 +23,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class HttpTaskServerTest {
-    private TaskManager manager = new InMemoryTaskManager();
-    private HttpTaskServer server = new HttpTaskServer(manager);
-    private Gson gson = new Gson();
+    private final TaskManager manager = new InMemoryTaskManager();
+    private final Gson gson = Gsons.getDefault();
+    private final HttpTaskServer server = new HttpTaskServer(manager, gson);
+
+    HttpTaskServerTest() {
+    }
 
     @BeforeEach
-    public void beforeEach() throws IOException {
+    public void beforeEach() {
         manager.deleteTasks();
         manager.deleteSubtasks();
         manager.deleteEpics();
@@ -41,9 +45,8 @@ class HttpTaskServerTest {
 
     @Test
     public void testAddTask() throws IOException, InterruptedException {
-        // создаём задачу
-        var task = new TaskPojo(null, "Test 2", "Testing task 2",
-                TaskStatus.NEW.toString(), 5, LocalDateTime.now().toString());
+        var task = new Task("Name", "Test 2", null,
+                TaskStatus.NEW, LocalDateTime.now(), Duration.ofHours(3));
         // конвертируем её в JSON
         String taskJson = gson.toJson(task);
 
@@ -62,7 +65,9 @@ class HttpTaskServerTest {
 
         assertNotNull(tasksFromManager, "Задачи не возвращаются");
         assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
-        assertEquals("Test 2", tasksFromManager.get(0).getName(), "Некорректное имя задачи");
+        assertEquals(task.getName(), tasksFromManager.getFirst().getName(), "Некорректное имя задачи");
+        assertEquals(task.getDescription(), tasksFromManager.getFirst().getDescription(), "Некорректное имя задачи");
+        assertEquals(task.getDescription(), tasksFromManager.getFirst().getDescription(), "Некорректное имя задачи");
     }
 
 }

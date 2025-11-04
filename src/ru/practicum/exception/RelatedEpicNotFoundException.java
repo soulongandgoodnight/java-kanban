@@ -1,4 +1,4 @@
 package ru.practicum.exception;
 
-public class RelatedEpicNotFoundException extends Exception {
+public class RelatedEpicNotFoundException extends RuntimeException {
 }

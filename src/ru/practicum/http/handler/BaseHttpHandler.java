@@ -1,13 +1,21 @@
 package ru.practicum.http.handler;
 
-import com.google.gson.GsonBuilder;
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import ru.practicum.manager.TaskManager;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public abstract class BaseHttpHandler implements HttpHandler {
+    protected final TaskManager taskManager;
+    protected final Gson gson;
+
+    public BaseHttpHandler(TaskManager taskManager, Gson gson) {
+        this.taskManager = taskManager;
+        this.gson = gson;
+    }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -34,7 +42,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
         if (obj == null) {
             sendOk(h);
         }
-        var text = toJson(obj);
+        var text = gson.toJson(obj);
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
         h.sendResponseHeaders(200, resp.length);
@@ -64,10 +72,5 @@ public abstract class BaseHttpHandler implements HttpHandler {
         h.getResponseHeaders().add("Content-Type", "text/plain;charset=utf-8");
         h.sendResponseHeaders(406, 0);
         h.close();
-    }
-
-    protected String toJson(Object obj) {
-        var gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(obj);
     }
 }

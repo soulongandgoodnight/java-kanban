@@ -5,19 +5,16 @@ import com.sun.net.httpserver.HttpExchange;
 import ru.practicum.exception.IntersectedWIthOtherTasksException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.RelatedEpicNotFoundException;
-import ru.practicum.http.pojo.SubtaskPojo;
 import ru.practicum.manager.TaskManager;
 import ru.practicum.model.Subtask;
-import ru.practicum.model.TaskStatus;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class SubtasksHandler extends BaseHttpHandler {
-    private final TaskManager taskManager;
 
-    public SubtasksHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+    public SubtasksHandler(TaskManager taskManager, Gson gson) {
+        super(taskManager, gson);
     }
 
     @Override
@@ -32,11 +29,7 @@ public class SubtasksHandler extends BaseHttpHandler {
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
         var inputStream = exchange.getRequestBody();
         var body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        var subtaskPojo = new Gson().fromJson(body, SubtaskPojo.class);
-        var subtaskId = subtaskPojo.getId() == null ? 0 : subtaskPojo.getId();
-        var epicId = subtaskPojo.getEpicId() == null ? 0 : subtaskPojo.getEpicId();
-        var subtask = new Subtask(subtaskPojo.getName(), subtaskPojo.getDescription(), subtaskId,
-                TaskStatus.valueOf(subtaskPojo.getStatus()), epicId, subtaskPojo.getStartTime(), subtaskPojo.getDuration());
+        var subtask = gson.fromJson(body, Subtask.class);
         try {
             if (subtask.getId() == 0) {
                 taskManager.createSubtask(subtask);

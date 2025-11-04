@@ -90,13 +90,13 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
             RelatedEpicNotFoundException {
         var originalManager = new FileBackedTaskManager(file);
         var task1 = new Task("Задача 1", "Описание задачи 1", 0, TaskStatus.NEW,
-                LocalDateTime.of(2025,12, 1,0,0), Duration.ofHours(3));
+                LocalDateTime.of(2025, 12, 1, 0, 0), Duration.ofHours(3));
         var task2 = new Task("Задача 2", "Описание задачи 2", 0, TaskStatus.NEW,
-                LocalDateTime.of(2025,11, 2,0,0), Duration.ofHours(3));
+                LocalDateTime.of(2025, 11, 2, 0, 0), Duration.ofHours(3));
         var epic1 = new Epic("Эпик 1", "Описание эпика 1", 0, TaskStatus.NEW,
-                LocalDateTime.of(2025,11, 3,0,0), Duration.ofHours(3));
+                LocalDateTime.of(2025, 11, 3, 0, 0), Duration.ofHours(3));
         var epic2 = new Epic("Эпик 2", "Описание эпика 2", 0, TaskStatus.NEW,
-                LocalDateTime.of(2025,11, 4,0,0), Duration.ofHours(3));
+                LocalDateTime.of(2025, 11, 4, 0, 0), Duration.ofHours(3));
 
         //do
         originalManager.createTask(task1);

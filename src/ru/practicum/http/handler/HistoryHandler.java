@@ -1,5 +1,6 @@
 package ru.practicum.http.handler;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import ru.practicum.manager.TaskManager;
 
@@ -7,10 +8,9 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class HistoryHandler extends BaseHttpHandler {
-    private final TaskManager taskManager;
 
-    public HistoryHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+    public HistoryHandler(TaskManager taskManager, Gson gson) {
+        super(taskManager, gson);
     }
 
     @Override
