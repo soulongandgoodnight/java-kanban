@@ -34,7 +34,7 @@ public class SubtasksHandler extends BaseHttpHandler {
             this.sendBadRequest(exchange);
             return;
         }
-        
+
         try {
             if (subtask.getId() == null || subtask.getId() == 0) {
                 taskManager.createSubtask(subtask);
