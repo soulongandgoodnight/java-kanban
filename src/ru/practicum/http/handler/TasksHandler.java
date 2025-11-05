@@ -44,6 +44,10 @@ public class TasksHandler extends BaseHttpHandler {
         var body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         var task = gson.fromJson(body, Task.class);
 
+        if (task == null) {
+            this.sendBadRequest(exchange);
+            return;
+        }
         try {
             if (task.getId() == null || task.getId() == 0) {
                 taskManager.createTask(task);

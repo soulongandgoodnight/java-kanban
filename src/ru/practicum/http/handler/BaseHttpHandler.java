@@ -73,4 +73,10 @@ public abstract class BaseHttpHandler implements HttpHandler {
         h.sendResponseHeaders(406, 0);
         h.close();
     }
+
+    protected void sendBadRequest(HttpExchange h) throws IOException {
+        h.getResponseHeaders().add("Content-Type", "text/plain;charset=utf-8");
+        h.sendResponseHeaders(400, 0);
+        h.close();
+    }
 }

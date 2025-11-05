@@ -30,8 +30,13 @@ public class SubtasksHandler extends BaseHttpHandler {
         var inputStream = exchange.getRequestBody();
         var body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         var subtask = gson.fromJson(body, Subtask.class);
+        if (subtask == null) {
+            this.sendBadRequest(exchange);
+            return;
+        }
+        
         try {
-            if (subtask.getId() == 0) {
+            if (subtask.getId() == null || subtask.getId() == 0) {
                 taskManager.createSubtask(subtask);
             } else {
                 taskManager.updateSubtask(subtask);

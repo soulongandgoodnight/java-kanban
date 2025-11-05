@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import static ru.practicum.model.ValidationExtensions.*;
+
 
 class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 

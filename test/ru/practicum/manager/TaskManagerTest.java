@@ -13,9 +13,10 @@ import ru.practicum.model.TaskStatus;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
+
+import static ru.practicum.model.ValidationExtensions.assertEpicsAreEqual;
+import static ru.practicum.model.ValidationExtensions.assertTaskSetsAreEqual;
 
 public abstract class TaskManagerTest<T extends TaskManager> {
     protected T taskManager;
@@ -335,7 +336,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         var actualEpic = taskManager.getEpic(epicId);
         var allSubtasks = taskManager.getSubtasks();
-        assertSubtaskSetsAreEqual(actualEpic.getSubtasks().stream(), allSubtasks.stream());
+        assertTaskSetsAreEqual(actualEpic.getSubtasks().stream(), allSubtasks.stream());
         allSubtasks.forEach(subtask -> {
             try {
                 assertEpicsAreEqual(actualEpic,
@@ -405,35 +406,5 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         var allTasks = taskManager.getTasks();
         Assertions.assertEquals(1, allTasks.size());
         Assertions.assertEquals(existingTaskId, allTasks.stream().findFirst().get().getId());
-    }
-
-    protected void assertTasksAreEqual(Task left, Task right) {
-        Assertions.assertEquals(left.getId(), right.getId());
-        Assertions.assertEquals(left.getName(), right.getName());
-        Assertions.assertEquals(left.getDescription(), right.getDescription());
-        Assertions.assertEquals(left.getStatus(), right.getStatus());
-        Assertions.assertEquals(left.getStartTime(), right.getStartTime());
-        Assertions.assertEquals(left.getDuration(), right.getDuration());
-        Assertions.assertEquals(left.getEndTime(), right.getEndTime());
-    }
-
-    protected void assertEpicsAreEqual(Epic left, Epic right) {
-        assertTasksAreEqual(left, right);
-        assertSubtaskSetsAreEqual(left.getSubtasks().stream(), right.getSubtasks().stream());
-    }
-
-    protected void assertSubtaskSetsAreEqual(Stream<Subtask> left, Stream<Subtask> right) {
-        var leftSubtasks = left.collect(Collectors.toMap(Task::getId, v -> v));
-        var rightSubtasks = right.collect(Collectors.toMap(Task::getId, v -> v));
-        for (var leftSubtask : leftSubtasks.entrySet()) {
-            var rightSubtask = rightSubtasks.get(leftSubtask.getKey());
-            Assertions.assertNotNull(rightSubtask);
-            assertSubtasksAreEqual(leftSubtask.getValue(), rightSubtask);
-        }
-    }
-
-    protected void assertSubtasksAreEqual(Subtask left, Subtask right) {
-        assertTasksAreEqual(left, right);
-        Assertions.assertEquals(left.getEpicId(), right.getEpicId());
     }
 }

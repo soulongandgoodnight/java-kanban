@@ -9,7 +9,7 @@ public class Epic extends Task {
     private final HashSet<Subtask> subtasks;
     private LocalDateTime endTime;
 
-    public Epic(String name, String description, int id, TaskStatus status, LocalDateTime startTime, Duration duration) {
+    public Epic(String name, String description, Integer id, TaskStatus status, LocalDateTime startTime, Duration duration) {
         super(name, description, id, status, startTime, duration);
         this.subtasks = new HashSet<>();
         recalculateTimeAndDuration();
@@ -62,9 +62,9 @@ public class Epic extends Task {
 
     private void recalculateTimeAndDuration() {
         this.startTime = subtasks.stream().map(a -> a.startTime).filter(Objects::nonNull).min(LocalDateTime::compareTo)
-                .orElse(LocalDateTime.MIN);
+                .orElse(null);
         this.endTime = subtasks.stream().map(Task::getEndTime).filter(Objects::nonNull).max(LocalDateTime::compareTo)
-                .orElse(LocalDateTime.MIN);
+                .orElse(null);
         this.duration = subtasks.stream().filter(a -> a.duration != null)
                 .map(a -> a.duration).reduce(Duration.ZERO, Duration::plus);
     }

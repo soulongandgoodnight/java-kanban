@@ -28,8 +28,18 @@ public class EpicsHandler extends BaseHttpHandler {
         var inputStream = exchange.getRequestBody();
         var body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         var epic = gson.fromJson(body, Epic.class);
-        taskManager.createEpic(epic);
-        this.sendCreated(exchange);
+
+        if (epic == null) {
+            this.sendBadRequest(exchange);
+            return;
+        }
+
+        if (epic.getId() == null) {
+            taskManager.createEpic(epic);
+            this.sendCreated(exchange);
+        }
+
+        this.sendNotFound(exchange);
     }
 
     @Override

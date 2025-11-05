@@ -11,12 +11,12 @@ import ru.practicum.model.TaskStatus;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    protected int uniqueTaskId = 1;
     protected final HashMap<Integer, Task> tasks;
     protected final HashMap<Integer, Epic> epics;
     protected final HashMap<Integer, Subtask> subtasks;
-    private final HistoryManager historyManager;
     protected final TreeSet<Task> tasksByStartTime;
+    private final HistoryManager historyManager;
+    protected int uniqueTaskId = 1;
 
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
@@ -147,12 +147,15 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IntersectedWIthOtherTasksException();
         }
 
-        if (tasks.containsKey(task.getId())) {
-            tasks.put(task.getId(), task);
-            tasksByStartTime.remove(task);
-            if (task.getStartTime() != null) {
-                tasksByStartTime.add(task);
-            }
+        var taskId = task.getId();
+        if (taskId == null || !this.tasks.containsKey(taskId)) {
+            throw new NotFoundException();
+        }
+
+        tasks.put(task.getId(), task);
+        tasksByStartTime.remove(task);
+        if (task.getStartTime() != null) {
+            tasksByStartTime.add(task);
         }
     }
 
